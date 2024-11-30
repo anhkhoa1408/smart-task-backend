@@ -14,8 +14,23 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory, {
+    swaggerOptions: {
+      authAction: {
+        JWT: {
+          name: 'JWT',
+          schema: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
+            description: '',
+          },
+          value: 'Bearer <JWT>',
+        },
+      },
+    },
+  });
 
-  SwaggerModule.setup('api', app, documentFactory);
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
