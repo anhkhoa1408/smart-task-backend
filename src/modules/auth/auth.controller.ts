@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { Body, HttpCode, Post, Req } from '@nestjs/common/decorators';
+import { Body, HttpCode, Post } from '@nestjs/common/decorators';
 import { HttpStatus } from '@nestjs/common/enums';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -14,14 +14,14 @@ export class AuthController {
   @Post('sign-up')
   @HttpCode(HttpStatus.CREATED)
   @ApiBody({ type: SignUpDto })
-  async signUp(@Req() req: Request, @Body() signUpDto: SignUpDto) {
-    console.log(signUpDto);
+  signUp(@Body() body: SignUpDto) {
+    return this.authService.signUp(body);
   }
 
   @Post('sign-in')
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: SignInDto })
-  async signIn(@Req() req: Request, @Body() signInDto: SignInDto) {
+  async signIn(@Body() signInDto: SignInDto) {
     console.log(signInDto);
   }
 }
