@@ -1,4 +1,4 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../libs/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 
 export class BaseRepository<

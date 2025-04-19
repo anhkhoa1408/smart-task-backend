@@ -13,8 +13,26 @@ export class AuthService {
   ) {}
 
   async signIn(body: SignInDto) {
-    console.log(body);
-    return null;
+    const { email, password } = body;
+    const user = await this.userService.findUser({
+      email,
+    });
+
+    if (!user) {
+      throw new BadRequestException('User is not registered');
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    return {
+      accessToken: this.jwtService.sign({
+        email,
+        name: user.name,
+      }),
+    };
   }
 
   async signUp(body: SignUpDto) {
@@ -48,9 +66,5 @@ export class AuthService {
       }),
       ...createdUser,
     };
-  }
-
-  async comparePasswordHash(password: string, passwordHash: string) {
-    return bcrypt.compareSync(password, passwordHash);
   }
 }
