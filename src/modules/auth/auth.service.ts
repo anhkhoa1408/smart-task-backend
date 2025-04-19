@@ -4,6 +4,8 @@ import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { pickFields } from 'src/utils';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +18,7 @@ export class AuthService {
     const { email, password } = body;
     const user = await this.userService.findUser({
       email,
+      isActive: true,
     });
 
     if (!user) {
@@ -38,12 +41,24 @@ export class AuthService {
   async signUp(body: SignUpDto) {
     const { name, email, password } = body;
     const user = await this.userService.findUser({
-      name,
-      email,
+      email: email,
     });
 
-    if (user) {
+    if (user.isActive) {
       throw new BadRequestException('User is registered');
+    }
+
+    if (!user.isActive) {
+      await this.userService.activeUser(email);
+
+      return {
+        accessToken: this.jwtService.sign({
+          name,
+          email,
+        }),
+        name,
+        email,
+      };
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -53,10 +68,7 @@ export class AuthService {
         email,
         password: hashPassword,
       },
-      {
-        name: true,
-        email: true,
-      },
+      pickFields<User>(['name', 'email']),
     );
 
     return {

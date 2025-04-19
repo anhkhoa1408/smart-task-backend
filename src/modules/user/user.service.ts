@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { UserRepository } from 'src/modules/user/user.repository';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -13,29 +14,6 @@ export class UserService {
     return this.userRepository.findUnique(userWhereUniqueInput, select);
   }
 
-  async findUsers(
-    params: {
-      skip?: number;
-      take?: number;
-      cursor?: Prisma.UserWhereUniqueInput;
-      where?: Prisma.UserWhereInput;
-      orderBy?: Prisma.UserOrderByWithRelationInput;
-    },
-    select?: Prisma.UserSelect | null,
-  ): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.userRepository.findMany(
-      {
-        skip,
-        take,
-        cursor,
-        where,
-        orderBy,
-      },
-      select,
-    );
-  }
-
   async createUser(
     data: Prisma.UserCreateInput,
     select?: Prisma.UserSelect | null,
@@ -43,18 +21,56 @@ export class UserService {
     return this.userRepository.create(data, select);
   }
 
-  async updateUser(params: {
-    where: Prisma.UserWhereUniqueInput;
-    data: Prisma.UserUpdateInput;
-  }): Promise<User> {
-    const { where, data } = params;
-    return this.userRepository.update({
-      data,
-      where,
+  async updateUserProfile(email: string, body: UpdateUserDto) {
+    const foundUser = await this.findUser({
+      email,
+    });
+
+    if (!foundUser) throw new BadRequestException('User is not registered');
+
+    return await this.userRepository.update({
+      where: {
+        email,
+      },
+      data: {
+        name: body.name,
+        phone: body.phone,
+        gender: body.gender,
+      },
     });
   }
 
-  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
-    return this.userRepository.delete(where);
+  async activeUser(email: string) {
+    const foundUser = await this.findUser({
+      email,
+    });
+
+    if (!foundUser) throw new BadRequestException('User is not registered');
+
+    return await this.userRepository.update({
+      where: {
+        email,
+      },
+      data: {
+        isActive: true,
+      },
+    });
+  }
+
+  async inactiveUser(email: string) {
+    const foundUser = await this.findUser({
+      email,
+    });
+
+    if (!foundUser) throw new BadRequestException('User is not registered');
+
+    return await this.userRepository.update({
+      where: {
+        email,
+      },
+      data: {
+        isActive: false,
+      },
+    });
   }
 }

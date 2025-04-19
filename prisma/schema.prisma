@@ -18,6 +18,9 @@ model User {
   id       String    @id @default(uuid()) @db.Uuid
   email    String    @unique
   name     String?
+  phone    String?
+  gender   Gender?
+  isActive Boolean   @default(true)
   password String
   Project  Project[]
 }
@@ -57,4 +60,9 @@ enum Status {
   TODO
   IN_PROGRESS
   COMPLETE
+}
+
+enum Gender {
+  MALE
+  FEMALE
 }
