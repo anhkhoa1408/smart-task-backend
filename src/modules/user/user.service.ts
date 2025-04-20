@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { UserRepository } from 'src/modules/user/user.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { pickFields } from 'src/utils';
 
 @Injectable()
 export class UserService {
@@ -37,6 +38,7 @@ export class UserService {
         phone: body.phone,
         gender: body.gender,
       },
+      select: pickFields<User>(['id', 'name', 'email', 'gender', 'phone']),
     });
   }
 

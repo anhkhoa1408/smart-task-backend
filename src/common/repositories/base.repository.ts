@@ -56,11 +56,13 @@ export class BaseRepository<
   async update(params: {
     where: WhereUniqueInput;
     data: UpdateInput;
+    select?: SelectInput | null;
   }): Promise<T> {
-    const { where, data } = params;
+    const { where, data, select } = params;
     return this.prismaService[this.model].update({
       where,
       data,
+      select,
     });
   }
 
