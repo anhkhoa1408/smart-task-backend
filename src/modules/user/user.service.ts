@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
-import { UserRepository } from 'src/modules/user/user.repository';
+import { UserRepository } from 'src/modules/user/repositories/user.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { pickFields } from 'src/utils';
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findUser(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
@@ -25,9 +25,12 @@ export class UserService {
   async updateUserProfile(email: string, body: UpdateUserDto) {
     const foundUser = await this.findUser({
       email,
+      isActive: true,
     });
 
-    if (!foundUser) throw new BadRequestException('User is not registered');
+    if (!foundUser) {
+      throw new BadRequestException('User is not registered');
+    }
 
     return await this.userRepository.update({
       where: {
@@ -45,9 +48,12 @@ export class UserService {
   async activeUser(email: string) {
     const foundUser = await this.findUser({
       email,
+      isActive: false,
     });
 
-    if (!foundUser) throw new BadRequestException('User is not registered');
+    if (!foundUser) {
+      throw new BadRequestException('User not found or already active');
+    }
 
     return await this.userRepository.update({
       where: {
@@ -62,9 +68,12 @@ export class UserService {
   async inactiveUser(email: string) {
     const foundUser = await this.findUser({
       email,
+      isActive: true,
     });
 
-    if (!foundUser) throw new BadRequestException('User is not registered');
+    if (!foundUser) {
+      throw new BadRequestException('User not found or already inactive');
+    }
 
     return await this.userRepository.update({
       where: {

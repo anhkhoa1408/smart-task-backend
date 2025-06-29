@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Patch,
   Put,
   Req,
   UseGuards,
@@ -34,7 +33,7 @@ export class UserController {
     );
   }
 
-  @Patch('profile/update')
+  @Put('profile/update')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async updateProfile(@Req() req: Request, @Body() body: UpdateUserDto) {
@@ -46,5 +45,12 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async inactiveProfile(@Req() req: Request) {
     return this.userService.inactiveUser(req.user.email);
+  }
+
+  @Put('profile/active')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async activeProfile(@Req() req: Request) {
+    return this.userService.activeUser(req.user.email);
   }
 }
