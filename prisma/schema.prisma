@@ -26,27 +26,31 @@ model User {
 }
 
 model Project {
-  id        String   @id @default(uuid()) @db.Uuid
-  title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.Uuid
-  Task      Task[]
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @db.Uuid
+  Task        Task[]
+  isArchive   Boolean  @default(false)
 }
 
 model Task {
-  id         String   @id @default(uuid()) @db.Uuid
-  title      String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  priority   Priority @default(LOW)
-  status     Status   @default(TODO)
-  project    Project  @relation(fields: [projectId], references: [id])
-  projectId  String   @db.Uuid
-  subTasks   Task[]   @relation("TaskToSubTasks")
-  parentTask Task?    @relation("TaskToSubTasks", fields: [parentId], references: [id])
-  parentId   String?  @db.Uuid // Nullable: root tasks won't have a parent
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  priority    Priority @default(LOW)
+  status      Status   @default(TODO)
+  project     Project  @relation(fields: [projectId], references: [id])
+  projectId   String   @db.Uuid
+  subTasks    Task[]   @relation("TaskToSubTasks")
+  parentTask  Task?    @relation("TaskToSubTasks", fields: [parentId], references: [id])
+  parentId    String?  @db.Uuid // Nullable: root tasks won't have a parent
+  isDelete    Boolean  @default(false)
 }
 
 enum Priority {

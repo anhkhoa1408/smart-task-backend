@@ -15,27 +15,26 @@ export class BaseRepository<
     private readonly model: Prisma.ModelName,
   ) {}
 
-  async findUnique(
-    where: WhereUniqueInput,
-    select?: SelectInput | null,
-  ): Promise<T | null> {
+  async findUnique(params: {
+    where: WhereUniqueInput;
+    select?: SelectInput | null;
+  }): Promise<T | null> {
+    const { where, select } = params;
     return this.prismaService[this.model].findUnique({
       where,
       select,
     });
   }
 
-  async findMany(
-    params: {
-      skip?: number;
-      take?: number;
-      cursor?: WhereUniqueInput;
-      where?: WhereInput;
-      orderBy: OrderInput;
-    },
-    select?: SelectInput | null,
-  ): Promise<T[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+  async findMany(params: {
+    skip?: number;
+    take?: number;
+    cursor?: WhereUniqueInput;
+    where?: WhereInput;
+    orderBy: OrderInput;
+    select?: SelectInput | null;
+  }): Promise<T[]> {
+    const { skip, take, cursor, where, orderBy, select } = params;
     return this.prismaService[this.model].findMany({
       skip,
       take,

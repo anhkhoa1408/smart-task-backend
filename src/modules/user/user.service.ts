@@ -12,7 +12,11 @@ export class UserService {
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
     select?: Prisma.UserSelect | null,
   ): Promise<User | null> {
-    return this.userRepository.findUnique(userWhereUniqueInput, select);
+    return this.userRepository.findUnique({
+      where: userWhereUniqueInput,
+      select:
+        select ?? pickFields<User>(['id', 'name', 'email', 'gender', 'phone']),
+    });
   }
 
   async createUser(
