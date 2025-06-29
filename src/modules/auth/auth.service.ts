@@ -32,6 +32,7 @@ export class AuthService {
 
     return {
       accessToken: this.jwtService.sign({
+        id: user.id,
         email,
         name: user.name,
       }),
@@ -53,6 +54,7 @@ export class AuthService {
 
       return {
         accessToken: this.jwtService.sign({
+          id: user.id,
           name,
           email,
         }),
@@ -73,6 +75,7 @@ export class AuthService {
 
     return {
       accessToken: this.jwtService.sign({
+        id: createdUser.id,
         name,
         email,
       }),
