@@ -16,10 +16,13 @@ export class AuthService {
 
   async signIn(body: SignInDto) {
     const { email, password } = body;
-    const user = await this.userService.findUser({
-      email,
-      isActive: true,
-    });
+    const user = await this.userService.findUser(
+      {
+        email,
+        isActive: true,
+      },
+      pickFields<User>(['id', 'name', 'email', 'password']),
+    );
 
     if (!user) {
       throw new BadRequestException('User is not registered');
@@ -33,7 +36,7 @@ export class AuthService {
     return {
       accessToken: this.jwtService.sign({
         id: user.id,
-        email,
+        email: user.email,
         name: user.name,
       }),
     };
