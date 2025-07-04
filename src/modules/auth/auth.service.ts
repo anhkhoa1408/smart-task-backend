@@ -39,31 +39,35 @@ export class AuthService {
         email: user.email,
         name: user.name,
       }),
+      email: user.email,
+      name: user.name,
     };
   }
 
   async signUp(body: SignUpDto) {
     const { name, email, password } = body;
-    const user = await this.userService.findUser({
-      email: email,
-    });
+    const user = await this.userService.findUser(
+      {
+        email: email,
+      },
+      pickFields<User>(['id', 'name', 'email', 'isActive']),
+    );
 
-    if (user.isActive) {
-      throw new BadRequestException('User is registered');
-    }
-
-    if (!user.isActive) {
-      await this.userService.activeUser(email);
-
-      return {
-        accessToken: this.jwtService.sign({
-          id: user.id,
+    if (user) {
+      if (user?.isActive) {
+        throw new BadRequestException('User is registered');
+      } else {
+        await this.userService.activeUser(email);
+        return {
+          accessToken: this.jwtService.sign({
+            id: user.id,
+            name,
+            email,
+          }),
           name,
           email,
-        }),
-        name,
-        email,
-      };
+        };
+      }
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
